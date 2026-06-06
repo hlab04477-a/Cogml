@@ -1,0 +1,309 @@
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Wallet SYSTEM FIX FINAL</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0b1220;
+color:white;
+}
+
+.container{max-width:900px;margin:auto;padding:20px;}
+
+.card{
+background:#111827;
+padding:20px;
+border-radius:14px;
+margin-top:15px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin-top:8px;
+border:none;
+border-radius:10px;
+}
+
+button{
+cursor:pointer;
+background:#22c55e;
+color:white;
+font-weight:bold;
+}
+
+.red{background:#ef4444;}
+.blue{background:#3b82f6;}
+
+.hidden{display:none;}
+
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+td,th{padding:10px;border-bottom:1px solid #374151;}
+
+.badge{padding:4px 8px;border-radius:8px;font-size:12px;}
+.pending{background:#f59e0b;}
+.success{background:#22c55e;}
+.fail{background:#ef4444;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div id="loginBox" class="card">
+<h2>LOGIN</h2>
+<input id="u" placeholder="Username">
+<input id="p" type="password" placeholder="Password">
+<button onclick="login()">เข้าสู่ระบบ</button>
+</div>
+
+<!-- USER -->
+<div id="userPanel" class="hidden">
+
+<div class="card">
+<h2>💰 เครดิต: <span id="credit"></span></h2>
+<button class="red" onclick="logout()">ออกจากระบบ</button>
+</div>
+
+<div class="card">
+<h3>💸 ถอนเงิน</h3>
+<input id="amount" placeholder="ขั้นต่ำ 100">
+<input id="wallet" placeholder="เบอร์วอเลท">
+<button onclick="withdraw()">ส่งถอน</button>
+</div>
+
+<div class="card">
+<h3>📋 ประวัติ</h3>
+<div id="userHistory"></div>
+</div>
+
+</div>
+
+<!-- ADMIN -->
+<div id="adminPanel" class="hidden">
+
+<div class="card">
+<h2>🛠 ADMIN</h2>
+<button class="red" onclick="logout()">ออกจากระบบ</button>
+</div>
+
+<div class="card">
+<h3>📥 รายการถอนทั้งหมด</h3>
+<div id="adminList"></div>
+</div>
+
+<div class="card">
+<h3>➕ สร้าง User</h3>
+<input id="newU">
+<input id="newP">
+<input id="newC">
+<button onclick="createUser()">สร้าง</button>
+</div>
+
+<div class="card">
+<h3>💰 เพิ่มเครดิต</h3>
+<input id="tU">
+<input id="aC">
+<button onclick="addCredit()">อัปเดต</button>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* ================= DATA (TEMP ONLY) ================= */
+
+let users = {
+admin:{pass:"1234",role:"admin",credit:0},
+user1:{pass:"1111",role:"user",credit:500}
+};
+
+let withdraws = [];
+let current=null;
+
+/* ================= LOGIN ================= */
+
+function login(){
+
+let u=document.getElementById("u").value;
+let p=document.getElementById("p").value;
+
+if(users[u] && users[u].pass===p){
+
+current=u;
+
+loginBox.classList.add("hidden");
+
+if(users[u].role==="admin"){
+adminPanel.classList.remove("hidden");
+loadAdmin();
+}else{
+userPanel.classList.remove("hidden");
+loadUser();
+}
+
+}else alert("Login ไม่ถูกต้อง");
+}
+
+/* ================= USER ================= */
+
+function loadUser(){
+credit.innerText = users[current].credit;
+loadUserHistory();
+}
+
+function withdraw(){
+
+let amount=parseInt(document.getElementById("amount").value);
+let wallet=document.getElementById("wallet").value;
+
+if(amount<100) return alert("ขั้นต่ำ 100");
+if(users[current].credit < amount) return alert("เครดิตไม่พอ");
+
+users[current].credit -= amount;
+
+withdraws.push({
+user:current,
+amount,
+wallet,
+status:"pending"
+});
+
+loadUser();
+loadUserHistory();
+
+alert("ส่งคำขอถอนแล้ว");
+}
+
+function loadUserHistory(){
+
+let html="";
+
+withdraws.filter(w=>w.user===current).forEach(w=>{
+html+=`
+<div>
+💸 ${w.amount} | ${w.wallet} |
+<span class="badge ${w.status}">
+${statusText(w.status)}
+</span>
+</div>`;
+});
+
+userHistory.innerHTML = html || "ไม่มีรายการ";
+}
+
+/* ================= ADMIN ================= */
+
+function loadAdmin(){
+
+let html=`<table>
+<tr>
+<th>User</th>
+<th>Amount</th>
+<th>Wallet</th>
+<th>Status</th>
+<th>Action</th>
+</tr>`;
+
+withdraws.forEach((w,i)=>{
+html+=`
+<tr>
+<td>${w.user}</td>
+<td>${w.amount}</td>
+<td>${w.wallet}</td>
+<td>${statusText(w.status)}</td>
+<td>
+<button class="blue" onclick="approve(${i})">✔</button>
+<button class="red" onclick="reject(${i})">✖</button>
+</td>
+</tr>`;
+});
+
+html+="</table>";
+
+adminList.innerHTML=html;
+}
+
+function approve(i){
+withdraws[i].status="success";
+loadAdmin();
+}
+
+function reject(i){
+withdraws[i].status="fail";
+loadAdmin();
+}
+
+/* ================= USER CONTROL ================= */
+
+function createUser(){
+
+let u=newU.value;
+let p=newP.value;
+let c=parseInt(newC.value)||0;
+
+if(users[u]) return alert("มี user แล้ว");
+
+users[u]={pass:p,role:"user",credit:c};
+
+alert("สร้าง user แล้ว");
+}
+
+function addCredit(){
+
+let u=tU.value;
+let a=parseInt(aC.value);
+
+if(!users[u]) return alert("ไม่พบ user");
+
+users[u].credit+=a;
+
+alert("อัปเดตเครดิตแล้ว");
+}
+
+/* ================= STATUS ================= */
+
+function statusText(s){
+if(s==="pending") return "รอตรวจสอบ";
+if(s==="success") return "สำเร็จ";
+return "ไม่สำเร็จ";
+}
+
+/* ================= LOGOUT ================= */
+
+function logout(){
+
+current=null;
+
+document.getElementById("loginBox").classList.remove("hidden");
+document.getElementById("userPanel").classList.add("hidden");
+document.getElementById("adminPanel").classList.add("hidden");
+
+document.getElementById("u").value="";
+document.getElementById("p").value="";
+}
+
+</script>
+
+</body>
+</html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pen</title>
+  </head>
+  <body>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
