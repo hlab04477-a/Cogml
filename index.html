@@ -1,56 +1,33 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Wallet SYSTEM FIX FINAL</title>
+<title>REALTIME WALLET SYSTEM</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#0b1220;
-color:white;
-}
-
-.container{max-width:900px;margin:auto;padding:20px;}
-
-.card{
-background:#111827;
-padding:20px;
-border-radius:14px;
-margin-top:15px;
-}
-
-input,button{
-width:100%;
-padding:12px;
-margin-top:8px;
-border:none;
-border-radius:10px;
-}
-
-button{
-cursor:pointer;
-background:#22c55e;
-color:white;
-font-weight:bold;
-}
-
-.red{background:#ef4444;}
-.blue{background:#3b82f6;}
-
-.hidden{display:none;}
-
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-td,th{padding:10px;border-bottom:1px solid #374151;}
-
-.badge{padding:4px 8px;border-radius:8px;font-size:12px;}
-.pending{background:#f59e0b;}
-.success{background:#22c55e;}
-.fail{background:#ef4444;}
+body{margin:0;font-family:Arial;background:#0b1220;color:white}
+.container{max-width:900px;margin:auto;padding:20px}
+.card{background:#111827;padding:20px;margin-top:15px;border-radius:12px}
+input,button{width:100%;padding:12px;margin-top:8px;border-radius:10px;border:none}
+button{cursor:pointer;background:#22c55e;color:white;font-weight:bold}
+.red{background:#ef4444}
+.blue{background:#3b82f6}
+.hidden{display:none}
+.badge{padding:4px 8px;border-radius:8px}
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="container">
@@ -58,8 +35,8 @@ td,th{padding:10px;border-bottom:1px solid #374151;}
 <!-- LOGIN -->
 <div id="loginBox" class="card">
 <h2>LOGIN</h2>
-<input id="u" placeholder="Username">
-<input id="p" type="password" placeholder="Password">
+<input id="u" placeholder="username">
+<input id="p" type="password" placeholder="password">
 <button onclick="login()">เข้าสู่ระบบ</button>
 </div>
 
@@ -74,13 +51,13 @@ td,th{padding:10px;border-bottom:1px solid #374151;}
 <div class="card">
 <h3>💸 ถอนเงิน</h3>
 <input id="amount" placeholder="ขั้นต่ำ 100">
-<input id="wallet" placeholder="เบอร์วอเลท">
+<input id="wallet" placeholder="วอเลท">
 <button onclick="withdraw()">ส่งถอน</button>
 </div>
 
 <div class="card">
-<h3>📋 ประวัติ</h3>
-<div id="userHistory"></div>
+<h3>📋 ประวัติถอน</h3>
+<div id="history"></div>
 </div>
 
 </div>
@@ -94,216 +71,192 @@ td,th{padding:10px;border-bottom:1px solid #374151;}
 </div>
 
 <div class="card">
-<h3>📥 รายการถอนทั้งหมด</h3>
+<h3>📥 ถอนทั้งหมด</h3>
 <div id="adminList"></div>
 </div>
 
 <div class="card">
-<h3>➕ สร้าง User</h3>
-<input id="newU">
-<input id="newP">
-<input id="newC">
-<button onclick="createUser()">สร้าง</button>
-</div>
-
-<div class="card">
-<h3>💰 เพิ่มเครดิต</h3>
-<input id="tU">
-<input id="aC">
-<button onclick="addCredit()">อัปเดต</button>
+<h3>➕ เพิ่มเครดิต user</h3>
+<input id="targetUser">
+<input id="addAmount">
+<button onclick="addCredit()">เพิ่ม</button>
 </div>
 
 </div>
 
 </div>
 
-<script>
+<!-- FIREBASE -->
+<script type="module">
 
-/* ================= DATA (TEMP ONLY) ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-let users = {
-admin:{pass:"1234",role:"admin",credit:0},
-user1:{pass:"1111",role:"user",credit:500}
+/* 🔥 ใส่ Firebase Config ตรงนี้ */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
 };
 
-let withdraws = [];
-let current=null;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ================= STATE ================= */
+let currentUser=null;
 
 /* ================= LOGIN ================= */
-
-function login(){
+window.login = async function(){
 
 let u=document.getElementById("u").value;
 let p=document.getElementById("p").value;
 
-if(users[u] && users[u].pass===p){
+let ref = doc(db,"users",u);
+let snap = await getDoc(ref);
 
-current=u;
+if(!snap.exists()) return alert("ไม่มี user");
 
-loginBox.classList.add("hidden");
+let data=snap.data();
 
-if(users[u].role==="admin"){
-adminPanel.classList.remove("hidden");
+if(data.pass!==p) return alert("รหัสผิด");
+
+currentUser=u;
+
+document.getElementById("loginBox").classList.add("hidden");
+
+if(data.role==="admin"){
+document.getElementById("adminPanel").classList.remove("hidden");
 loadAdmin();
 }else{
-userPanel.classList.remove("hidden");
+document.getElementById("userPanel").classList.remove("hidden");
 loadUser();
 }
 
-}else alert("Login ไม่ถูกต้อง");
 }
 
 /* ================= USER ================= */
+async function loadUser(){
 
-function loadUser(){
-credit.innerText = users[current].credit;
-loadUserHistory();
+let ref=doc(db,"users",currentUser);
+
+onSnapshot(ref,(snap)=>{
+let data=snap.data();
+document.getElementById("credit").innerText=data.credit;
+});
+
+loadHistory();
 }
 
-function withdraw(){
+window.withdraw = async function(){
 
 let amount=parseInt(document.getElementById("amount").value);
 let wallet=document.getElementById("wallet").value;
 
 if(amount<100) return alert("ขั้นต่ำ 100");
-if(users[current].credit < amount) return alert("เครดิตไม่พอ");
 
-users[current].credit -= amount;
+let userRef=doc(db,"users",currentUser);
+let snap=await getDoc(userRef);
 
-withdraws.push({
-user:current,
-amount,
-wallet,
-status:"pending"
+let credit=snap.data().credit;
+
+if(credit<amount) return alert("เงินไม่พอ");
+
+await updateDoc(userRef,{
+credit:credit-amount
 });
 
-loadUser();
-loadUserHistory();
+await addDoc(collection(db,"withdraws"),{
+user:currentUser,
+amount,
+wallet,
+status:"pending",
+time:Date.now()
+});
 
-alert("ส่งคำขอถอนแล้ว");
+alert("ส่งถอนแล้ว");
 }
 
-function loadUserHistory(){
+/* ================= HISTORY ================= */
+function loadHistory(){
+
+let q=query(collection(db,"withdraws"),orderBy("time","desc"));
+
+onSnapshot(q,(snap)=>{
 
 let html="";
 
-withdraws.filter(w=>w.user===current).forEach(w=>{
-html+=`
-<div>
-💸 ${w.amount} | ${w.wallet} |
-<span class="badge ${w.status}">
-${statusText(w.status)}
-</span>
-</div>`;
+snap.forEach(d=>{
+let w=d.data();
+if(w.user===currentUser){
+html+=`<div>💸 ${w.amount} | ${w.wallet} | ${w.status}</div>`;
+}
 });
 
-userHistory.innerHTML = html || "ไม่มีรายการ";
+document.getElementById("history").innerHTML=html || "ไม่มีข้อมูล";
+
+});
+
 }
 
 /* ================= ADMIN ================= */
-
 function loadAdmin(){
 
-let html=`<table>
-<tr>
-<th>User</th>
-<th>Amount</th>
-<th>Wallet</th>
-<th>Status</th>
-<th>Action</th>
-</tr>`;
+let q=query(collection(db,"withdraws"),orderBy("time","desc"));
 
-withdraws.forEach((w,i)=>{
+onSnapshot(q,(snap)=>{
+
+let html="<table width='100%'>";
+
+snap.forEach(d=>{
+let w=d.data();
+
 html+=`
 <tr>
 <td>${w.user}</td>
 <td>${w.amount}</td>
 <td>${w.wallet}</td>
-<td>${statusText(w.status)}</td>
-<td>
-<button class="blue" onclick="approve(${i})">✔</button>
-<button class="red" onclick="reject(${i})">✖</button>
-</td>
+<td>${w.status}</td>
 </tr>`;
 });
 
 html+="</table>";
 
-adminList.innerHTML=html;
+document.getElementById("adminList").innerHTML=html;
+
+});
+
 }
 
-function approve(i){
-withdraws[i].status="success";
-loadAdmin();
-}
+/* ================= ADD CREDIT ================= */
+window.addCredit = async function(){
 
-function reject(i){
-withdraws[i].status="fail";
-loadAdmin();
-}
+let u=document.getElementById("targetUser").value;
+let a=parseInt(document.getElementById("addAmount").value);
 
-/* ================= USER CONTROL ================= */
+let ref=doc(db,"users",u);
+let snap=await getDoc(ref);
 
-function createUser(){
+if(!snap.exists()) return alert("ไม่พบ user");
 
-let u=newU.value;
-let p=newP.value;
-let c=parseInt(newC.value)||0;
+let credit=snap.data().credit;
 
-if(users[u]) return alert("มี user แล้ว");
+await updateDoc(ref,{
+credit:credit+a
+});
 
-users[u]={pass:p,role:"user",credit:c};
-
-alert("สร้าง user แล้ว");
-}
-
-function addCredit(){
-
-let u=tU.value;
-let a=parseInt(aC.value);
-
-if(!users[u]) return alert("ไม่พบ user");
-
-users[u].credit+=a;
-
-alert("อัปเดตเครดิตแล้ว");
-}
-
-/* ================= STATUS ================= */
-
-function statusText(s){
-if(s==="pending") return "รอตรวจสอบ";
-if(s==="success") return "สำเร็จ";
-return "ไม่สำเร็จ";
+alert("เพิ่มเครดิตแล้ว");
 }
 
 /* ================= LOGOUT ================= */
-
-function logout(){
-
-current=null;
-
-document.getElementById("loginBox").classList.remove("hidden");
-document.getElementById("userPanel").classList.add("hidden");
-document.getElementById("adminPanel").classList.add("hidden");
-
-document.getElementById("u").value="";
-document.getElementById("p").value="";
+window.logout=function(){
+location.reload();
 }
 
 </script>
 
 </body>
 </html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="./style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pen</title>
-  </head>
-  <body>
-
-    <script src="./script.js"></script>
+    
   </body>
+  
 </html>
