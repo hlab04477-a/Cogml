@@ -13,246 +13,42 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>REALTIME WALLET SYSTEM</title>
+<title>ยืนยัน</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b1220;color:white}
-.container{max-width:900px;margin:auto;padding:20px}
-.card{background:#111827;padding:20px;margin-top:15px;border-radius:12px}
-input,button{width:100%;padding:12px;margin-top:8px;border-radius:10px;border:none}
-button{cursor:pointer;background:#22c55e;color:white;font-weight:bold}
-.red{background:#ef4444}
-.blue{background:#3b82f6}
-.hidden{display:none}
-.badge{padding:4px 8px;border-radius:8px}
-</style>
+body{
+  font-family: Arial;
+  text-align: center;
+  padding: 60px;
+  background: #0b1220;
+  color: white;
+}
 
+a.button{
+  display: inline-block;
+  padding: 15px 30px;
+  font-size: 18px;
+  background: #00c853;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+}
+
+a.button:active{
+  transform: scale(0.95);
+}
+</style>
 </head>
+
 <body>
 
-<div class="container">
-
-<!-- LOGIN -->
-<div id="loginBox" class="card">
-<h2>LOGIN</h2>
-<input id="u" placeholder="username">
-<input id="p" type="password" placeholder="password">
-<button onclick="login()">เข้าสู่ระบบ</button>
-</div>
-
-<!-- USER -->
-<div id="userPanel" class="hidden">
-
-<div class="card">
-<h2>💰 เครดิต: <span id="credit"></span></h2>
-<button class="red" onclick="logout()">ออกจากระบบ</button>
-</div>
-
-<div class="card">
-<h3>💸 ถอนเงิน</h3>
-<input id="amount" placeholder="ขั้นต่ำ 100">
-<input id="wallet" placeholder="วอเลท">
-<button onclick="withdraw()">ส่งถอน</button>
-</div>
-
-<div class="card">
-<h3>📋 ประวัติถอน</h3>
-<div id="history"></div>
-</div>
-
-</div>
-
-<!-- ADMIN -->
-<div id="adminPanel" class="hidden">
-
-<div class="card">
-<h2>🛠 ADMIN</h2>
-<button class="red" onclick="logout()">ออกจากระบบ</button>
-</div>
-
-<div class="card">
-<h3>📥 ถอนทั้งหมด</h3>
-<div id="adminList"></div>
-</div>
-
-<div class="card">
-<h3>➕ เพิ่มเครดิต user</h3>
-<input id="targetUser">
-<input id="addAmount">
-<button onclick="addCredit()">เพิ่ม</button>
-</div>
-
-</div>
-
-</div>
-
-<!-- FIREBASE -->
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-
-/* 🔥 ใส่ Firebase Config ตรงนี้ */
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/* ================= STATE ================= */
-let currentUser=null;
-
-/* ================= LOGIN ================= */
-window.login = async function(){
-
-let u=document.getElementById("u").value;
-let p=document.getElementById("p").value;
-
-let ref = doc(db,"users",u);
-let snap = await getDoc(ref);
-
-if(!snap.exists()) return alert("ไม่มี user");
-
-let data=snap.data();
-
-if(data.pass!==p) return alert("รหัสผิด");
-
-currentUser=u;
-
-document.getElementById("loginBox").classList.add("hidden");
-
-if(data.role==="admin"){
-document.getElementById("adminPanel").classList.remove("hidden");
-loadAdmin();
-}else{
-document.getElementById("userPanel").classList.remove("hidden");
-loadUser();
-}
-
-}
-
-/* ================= USER ================= */
-async function loadUser(){
-
-let ref=doc(db,"users",currentUser);
-
-onSnapshot(ref,(snap)=>{
-let data=snap.data();
-document.getElementById("credit").innerText=data.credit;
-});
-
-loadHistory();
-}
-
-window.withdraw = async function(){
-
-let amount=parseInt(document.getElementById("amount").value);
-let wallet=document.getElementById("wallet").value;
-
-if(amount<100) return alert("ขั้นต่ำ 100");
-
-let userRef=doc(db,"users",currentUser);
-let snap=await getDoc(userRef);
-
-let credit=snap.data().credit;
-
-if(credit<amount) return alert("เงินไม่พอ");
-
-await updateDoc(userRef,{
-credit:credit-amount
-});
-
-await addDoc(collection(db,"withdraws"),{
-user:currentUser,
-amount,
-wallet,
-status:"pending",
-time:Date.now()
-});
-
-alert("ส่งถอนแล้ว");
-}
-
-/* ================= HISTORY ================= */
-function loadHistory(){
-
-let q=query(collection(db,"withdraws"),orderBy("time","desc"));
-
-onSnapshot(q,(snap)=>{
-
-let html="";
-
-snap.forEach(d=>{
-let w=d.data();
-if(w.user===currentUser){
-html+=`<div>💸 ${w.amount} | ${w.wallet} | ${w.status}</div>`;
-}
-});
-
-document.getElementById("history").innerHTML=html || "ไม่มีข้อมูล";
-
-});
-
-}
-
-/* ================= ADMIN ================= */
-function loadAdmin(){
-
-let q=query(collection(db,"withdraws"),orderBy("time","desc"));
-
-onSnapshot(q,(snap)=>{
-
-let html="<table width='100%'>";
-
-snap.forEach(d=>{
-let w=d.data();
-
-html+=`
-<tr>
-<td>${w.user}</td>
-<td>${w.amount}</td>
-<td>${w.wallet}</td>
-<td>${w.status}</td>
-</tr>`;
-});
-
-html+="</table>";
-
-document.getElementById("adminList").innerHTML=html;
-
-});
-
-}
-
-/* ================= ADD CREDIT ================= */
-window.addCredit = async function(){
-
-let u=document.getElementById("targetUser").value;
-let a=parseInt(document.getElementById("addAmount").value);
-
-let ref=doc(db,"users",u);
-let snap=await getDoc(ref);
-
-if(!snap.exists()) return alert("ไม่พบ user");
-
-let credit=snap.data().credit;
-
-await updateDoc(ref,{
-credit:credit+a
-});
-
-alert("เพิ่มเครดิตแล้ว");
-}
-
-/* ================= LOGOUT ================= */
-window.logout=function(){
-location.reload();
-}
-
-</script>
+<h2>กดตกลงเพื่อไปต่อ</h2>
+
+<a class="button"
+href="https://gift.truemoney.com/campaign/?v=019ea798117877e69e50b4569ccd5a6760o"
+target="_blank">
+ตกลง
+</a>
 
 </body>
 </html>
