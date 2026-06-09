@@ -1,58 +1,123 @@
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>Untitled</title>
-    
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ยืนยัน</title>
+<title>Green Click Reward Game</title>
 
 <style>
-body{
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-family: Arial;
+  background: radial-gradient(circle at top, #0f3d2e, #050a08);
+  color: #d1ffe8;
+}
+
+.container {
   text-align: center;
-  padding: 60px;
-  background: #0b1220;
-  color: white;
+  background: rgba(0,0,0,0.4);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 0 25px #00ff9d55;
 }
 
-a.button{
-  display: inline-block;
-  padding: 15px 30px;
-  font-size: 18px;
-  background: #00c853;
-  color: white;
-  text-decoration: none;
-  border-radius: 10px;
+button {
+  font-size: 28px;
+  padding: 18px 50px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  background: linear-gradient(45deg, #00ff9d, #00b36b);
+  color: #00150c;
+  font-weight: bold;
 }
 
-a.button:active{
+button:active {
   transform: scale(0.95);
+}
+
+.count {
+  margin-top: 20px;
+  font-size: 26px;
+}
+
+#msg {
+  margin-top: 15px;
+  font-size: 22px;
+  color: #00ff9d;
 }
 </style>
 </head>
 
 <body>
 
-<h2>กดตกลงเพื่อไปต่อ</h2>
+<div class="container">
+  <button onclick="clickBtn()">CLICK</button>
+  <div class="count" id="count">0</div>
+  <div id="msg"></div>
+</div>
 
-<a class="button"
-href="https://gift.truemoney.com/campaign/?v=019ea798117877e69e50b4569ccd5a6760o"
-target="_blank">
-ตกลง
-</a>
+<script>
+let count = 0;
+let lastClick = 0;
+let human = false;
+let canClick = true;
+
+// ตรวจว่ามีคนใช้งานจริง
+document.addEventListener("mousemove", () => human = true);
+document.addEventListener("touchstart", () => human = true);
+document.addEventListener("keydown", () => human = true);
+
+function clickSound(){
+  let ctx = new (window.AudioContext || window.webkitAudioContext)();
+  let osc = ctx.createOscillator();
+  let gain = ctx.createGain();
+
+  osc.type = "square";
+  osc.frequency.value = 500;
+  gain.gain.value = 0.05;
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + 0.05);
+}
+
+function clickBtn() {
+  let now = Date.now();
+
+  // ต้องเป็น user จริง
+  if (!human) {
+    document.getElementById("msg").innerText = "ระบบไม่พบผู้เล่นจริง";
+    return;
+  }
+
+  // กันกดรัว
+  if (!canClick || now - lastClick < 150) return;
+
+  lastClick = now;
+  canClick = false;
+
+  setTimeout(() => {
+    canClick = true;
+  }, 150 + Math.random() * 150);
+
+  if (count >= 1000) return;
+
+  count++;
+  document.getElementById("count").innerText = count;
+
+  clickSound();
+
+  if (count === 1000) {
+    document.getElementById("msg").innerText = "🎉 คุณได้รับรางวัลในเกม: 50 Coin";
+  }
+}
+</script>
 
 </body>
-</html>
-    
-  </body>
-  
 </html>
