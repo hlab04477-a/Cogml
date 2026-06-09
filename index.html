@@ -2,120 +2,129 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Green Click Reward Game</title>
+<title>Click Game</title>
 
 <style>
-body {
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: Arial;
-  background: radial-gradient(circle at top, #0f3d2e, #050a08);
-  color: #d1ffe8;
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#0b2e13;
+font-family:Arial;
+color:white;
 }
 
-.container {
-  text-align: center;
-  background: rgba(0,0,0,0.4);
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 0 25px #00ff9d55;
+.box{
+text-align:center;
+background:#0f3d1f;
+padding:30px;
+border-radius:15px;
+width:300px;
 }
 
-button {
-  font-size: 28px;
-  padding: 18px 50px;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-  background: linear-gradient(45deg, #00ff9d, #00b36b);
-  color: #00150c;
-  font-weight: bold;
+button{
+font-size:20px;
+padding:15px 30px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#00c853;
+color:white;
+margin-top:15px;
 }
 
-button:active {
-  transform: scale(0.95);
+button:active{
+transform:scale(0.95);
 }
 
-.count {
-  margin-top: 20px;
-  font-size: 26px;
+.count{
+font-size:24px;
+margin-top:10px;
 }
 
-#msg {
-  margin-top: 15px;
-  font-size: 22px;
-  color: #00ff9d;
+.result{
+margin-top:15px;
+font-size:20px;
+color:#ffd54f;
+}
+
+.warn{
+margin-top:10px;
+color:red;
+font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <button onclick="clickBtn()">CLICK</button>
-  <div class="count" id="count">0</div>
-  <div id="msg"></div>
+<div class="box">
+<h2>เกมกดปุ่ม</h2>
+
+<div class="count">จำนวนครั้ง: <span id="c">0</span></div>
+
+<button id="btn" onclick="addClick()">กดเลย</button>
+
+<div class="result" id="r"></div>
+<div class="warn" id="w"></div>
 </div>
 
 <script>
 let count = 0;
-let lastClick = 0;
-let human = false;
-let canClick = true;
+let lastClickTime = 0;
+let clicks = [];
+let blocked = false;
 
-// ตรวจว่ามีคนใช้งานจริง
-document.addEventListener("mousemove", () => human = true);
-document.addEventListener("touchstart", () => human = true);
-document.addEventListener("keydown", () => human = true);
+function addClick(){
+if(blocked) return;
 
-function clickSound(){
-  let ctx = new (window.AudioContext || window.webkitAudioContext)();
-  let osc = ctx.createOscillator();
-  let gain = ctx.createGain();
+let now = Date.now();
 
-  osc.type = "square";
-  osc.frequency.value = 500;
-  gain.gain.value = 0.05;
-
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc.start();
-  osc.stop(ctx.currentTime + 0.05);
+// กันกดเร็วเกิน (ออโต้คลิก)
+if(now - lastClickTime < 50){
+return cheat();
 }
 
-function clickBtn() {
-  let now = Date.now();
+lastClickTime = now;
 
-  // ต้องเป็น user จริง
-  if (!human) {
-    document.getElementById("msg").innerText = "ระบบไม่พบผู้เล่นจริง";
-    return;
-  }
+// เก็บช่วงเวลา
+clicks.push(now);
+if(clicks.length > 8) clicks.shift();
 
-  // กันกดรัว
-  if (!canClick || now - lastClick < 150) return;
+// ตรวจความผิดปกติแบบเบา ๆ
+if(clicks.length === 8){
+let intervals = [];
 
-  lastClick = now;
-  canClick = false;
+for(let i=1;i<clicks.length;i++){
+intervals.push(clicks[i] - clicks[i-1]);
+}
 
-  setTimeout(() => {
-    canClick = true;
-  }, 150 + Math.random() * 150);
+// หาเฉลี่ย
+let avg = intervals.reduce((a,b)=>a+b)/intervals.length;
 
-  if (count >= 1000) return;
+// วัดความ “เป๊ะเกินไป”
+let variance = intervals.reduce((a,b)=>a + Math.abs(b-avg),0)/intervals.length;
 
-  count++;
-  document.getElementById("count").innerText = count;
+// ถ้าเร็วและนิ่งผิดปกติ
+if(avg < 60 && variance < 5){
+return cheat();
+}
+}
 
-  clickSound();
+count++;
+document.getElementById("c").innerText = count;
 
-  if (count === 1000) {
-    document.getElementById("msg").innerText = "🎉 คุณได้รับรางวัลในเกม: 50 Coin";
-  }
+if(count === 500){
+document.getElementById("r").innerText = "ได้รับ 50 ทรูมันนี่";
+}
+}
+
+function cheat(){
+blocked = true;
+document.getElementById("w").innerText = "ห้ามใช้ออโต้คลิกนะครับ";
+document.getElementById("btn").disabled = true;
 }
 </script>
 
