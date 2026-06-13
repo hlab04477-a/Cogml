@@ -1,134 +1,242 @@
 <!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First 5G System</title>
 
-<!-- กันซูมมือถือ -->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-<title>Click Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
 body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#0b2e13;
-font-family:Arial;
-color:white;
-touch-action: manipulation;
+  margin:0;
+  height:100vh;
+  overflow:hidden;
+  font-family:'Kanit',sans-serif;
+  background: radial-gradient(circle at top,#0f172a,#020617);
+}
+
+.glow-bg{
+  position:absolute;
+  width:600px;
+  height:600px;
+  background:conic-gradient(#22c55e,#3b82f6,#a855f7,#22c55e);
+  filter:blur(150px);
+  opacity:0.35;
+  top:-150px;
+  left:-150px;
+  animation:spin 10s linear infinite;
+}
+
+.glow-bg2{
+  position:absolute;
+  width:400px;
+  height:400px;
+  background:conic-gradient(#f43f5e,#f59e0b,#22c55e,#3b82f6);
+  filter:blur(120px);
+  opacity:0.25;
+  bottom:-120px;
+  right:-120px;
+  animation:spinReverse 12s linear infinite;
+}
+
+@keyframes spin{
+  100%{transform:rotate(360deg);}
+}
+
+@keyframes spinReverse{
+  100%{transform:rotate(-360deg);}
+}
+
+.particle{
+  position:absolute;
+  width:6px;
+  height:6px;
+  background:white;
+  border-radius:50%;
+  opacity:0.6;
+  animation:float 6s infinite linear;
+}
+
+@keyframes float{
+  0%{transform:translateY(100vh);}
+  100%{transform:translateY(-10vh);}
 }
 
 .box{
-text-align:center;
-background:#0f3d1f;
-padding:30px;
-border-radius:15px;
-width:300px;
-box-shadow:0 0 20px rgba(0,255,100,0.2);
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:90%;
+  max-width:520px;
+  padding:25px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(18px);
+  box-shadow:0 0 60px rgba(34,197,94,0.25);
+  text-align:center;
+}
+
+h1{
+  color:#22c55e;
+  margin:0;
+  font-size:28px;
+  text-shadow:0 0 15px rgba(34,197,94,0.6);
+}
+
+h2{
+  color:white;
+  font-weight:500;
 }
 
 button{
-font-size:20px;
-padding:15px 30px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-background:#00c853;
-color:white;
-margin-top:15px;
-touch-action: manipulation;
+  margin:10px;
+  padding:12px 18px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.2s;
 }
 
-button:active{
-transform:scale(0.95);
+button:hover{transform:scale(1.1);}
+
+.red{
+  background:linear-gradient(135deg,#ef4444,#991b1b);
+  color:white;
 }
 
-.count{
-font-size:24px;
-margin-top:10px;
+.black{
+  background:linear-gradient(135deg,#111827,#000);
+  color:white;
 }
 
-.result{
-margin-top:15px;
-font-size:20px;
-color:#ffd54f;
+#result{
+  margin-top:15px;
+  color:white;
+  font-size:18px;
 }
 
-.warn{
-margin-top:10px;
-color:red;
-font-weight:bold;
+.actions{
+  margin-top:18px;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.line{
+  display:inline-block;
+  padding:12px 18px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#00c300,#009900);
+  color:white;
+  text-decoration:none;
+  font-weight:700;
+}
+
+.code-btn{
+  display:inline-block;
+  padding:12px 18px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color:white;
+  text-decoration:none;
+  font-weight:700;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-<h2>เกมกดปุ่ม</h2>
-
-<div class="count">จำนวนครั้ง: <span id="c">0</span></div>
-
-<button id="btn" onclick="addClick()">กดเลย</button>
-
-<div class="result" id="r"></div>
-<div class="warn" id="w"></div>
-</div>
+<div class="glow-bg"></div>
+<div class="glow-bg2"></div>
 
 <script>
-let count = 0;
-let lastClick = 0;
-let clicks = [];
-let blocked = false;
-
-function addClick(){
-if(blocked) return;
-
-let now = Date.now();
-
-// กันกดรัวผิดธรรมชาติ
-if(now - lastClick < 40){
-return cheat();
-}
-lastClick = now;
-
-// เก็บ pattern
-clicks.push(now);
-if(clicks.length > 8) clicks.shift();
-
-// ตรวจ pattern ออโต้คลิกแบบเบา
-if(clicks.length === 8){
-let diffs = [];
-for(let i=1;i<clicks.length;i++){
-diffs.push(clicks[i] - clicks[i-1]);
-}
-
-let avg = diffs.reduce((a,b)=>a+b)/diffs.length;
-let variance = diffs.reduce((a,b)=>a+Math.abs(b-avg),0)/diffs.length;
-
-// ถ้าเร็ว + เป๊ะเกินไป
-if(avg < 55 && variance < 5){
-return cheat();
-}
-}
-
-count++;
-document.getElementById("c").innerText = count;
-
-if(count === 500){
-document.getElementById("r").innerText = "ได้รับ 50 ทรูมันนี่";
-}
-}
-
-function cheat(){
-blocked = true;
-document.getElementById("w").innerText = "ห้ามใช้ออโต้คลิกนะครับ";
-document.getElementById("btn").disabled = true;
+for(let i=0;i<25;i++){
+  let p=document.createElement("div");
+  p.className="particle";
+  p.style.left=Math.random()*100+"vw";
+  p.style.animationDuration=(3+Math.random()*5)+"s";
+  document.body.appendChild(p);
 }
 </script>
 
+<div class="box">
+
+  <h1>กิจกรรมแจกโค้ดฟรี</h1>
+  <h2>ระบบนี้ถูกสร้างจาก เฟิส 5G</h2>
+
+  <button class="red" onclick="check('แดง')">สีแดง</button>
+  <button class="black" onclick="check('ดำ')">สีดำ</button>
+
+  <div id="result"></div>
+
+  <div class="actions">
+
+    <a class="line"
+       href="https://line.me/ti/p/sTZhwLqr_x"
+       target="_blank">
+       LINE: หากสนใจทำระบบแบบนี้ คลิ๊กที่นี่
+    </a>
+
+    <a class="code-btn"
+       href="https://shorturl.asia/wWQUs"
+       onclick="lockOnce()">
+       ใส่โค้ด
+    </a>
+
+  </div>
+
+</div>
+
+<script>
+
+const LOCK_KEY="first5g_used";
+const answer = Math.random() < 0.5 ? "แดง" : "ดำ";
+const rewardCode="2IX86E0FW";
+
+const resultBox=document.getElementById("result");
+
+function check(c){
+
+  if(localStorage.getItem(LOCK_KEY)){
+    resultBox.innerHTML="❌ ใช้สิทธิไปแล้ว 1 เครื่อง";
+    return;
+  }
+
+  localStorage.setItem(LOCK_KEY,"used");
+
+  if(c===answer){
+    resultBox.innerHTML="✅ ถูกต้อง! 🎉<br><br>โค้ดของคุณ: <b>"+rewardCode+"</b>";
+  }else{
+    resultBox.innerHTML="❌ ผิด แต่ใช้สิทธิแล้ว";
+  }
+}
+
+function lockOnce(){
+  localStorage.setItem("first5g_used","used");
+}
+
+</script>
+
 </body>
+</html>
+    
+  </body>
+  
 </html>
