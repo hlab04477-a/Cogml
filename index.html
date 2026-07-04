@@ -2,238 +2,143 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>SA SHOP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COC NCC Percent System</title>
 
 <style>
-html, body{
-    margin:0;
-    padding:0;
-    height:100%;
-    font-family:sans-serif;
-    background: radial-gradient(circle, #061022, #02040a);
-    color:white;
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#000,#111,#000);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-/* เต็มจอ */
-.main{
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
+/* container */
+.container{
+  width:360px;
+  background:#0f0f0f;
+  border:1px solid #333;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 0 25px rgba(255,255,255,0.05);
+  text-align:center;
 }
 
 /* header */
-h1{
-    margin:10px 0 0;
-    text-align:center;
-    color:#00c3ff;
-    text-shadow:0 0 12px #00c3ff;
+.header{
+  font-size:20px;
+  letter-spacing:3px;
+  margin-bottom:15px;
 }
 
-.tag{
-    text-align:center;
-    color:#00ff88;
-    font-size:14px;
+/* input */
+input{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #444;
+  background:#000;
+  color:white;
+  text-align:center;
+  font-size:15px;
 }
 
-/* buttons */
-.buttons{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    margin-top:10px;
-}
-
+/* button */
 button{
-    padding:14px 18px;
-    margin:6px;
-    border:none;
-    border-radius:10px;
-    font-weight:bold;
-    cursor:pointer;
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:white;
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
 }
 
-.red{background:#ff2d2d;color:white;}
-.blue{background:#1e6bff;color:white;}
-.tie{background:#ffd000;color:black;}
-.gray{background:#444;color:white;}
-
-/* big box */
-.bigBox{
-    width:80%;
-    max-width:400px;
-    height:160px;
-    margin:10px auto;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:70px;
-    font-weight:bold;
-    border-radius:20px;
-    border:4px solid #00c3ff;
-    box-shadow:0 0 20px #00c3ff;
+button:hover{
+  background:#ccc;
 }
 
-.redBox{background:#ff2d2d;box-shadow:0 0 30px #ff2d2d;}
-.blueBox{background:#1e6bff;box-shadow:0 0 30px #1e6bff;}
-.tieBox{background:#ffd000;color:black;box-shadow:0 0 30px #ffd000;}
-
-/* trend */
-.box{
-    text-align:center;
-    font-size:18px;
-    color:#00c3ff;
-    text-shadow:0 0 10px #00c3ff;
-    margin:5px;
+/* result */
+.result{
+  margin-top:15px;
+  font-size:18px;
+  color:#00ffcc;
 }
 
-/* road */
-.road{
-    flex:1;
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    align-content:flex-start;
-    padding:10px;
-    overflow:auto;
+/* footer creator */
+.creator{
+  margin-top:20px;
+  font-size:13px;
+  letter-spacing:3px;
+  color:white;
+  animation:blink 1s infinite;
 }
 
-.cell{
-    width:40px;
-    height:40px;
-    margin:4px;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-weight:bold;
+/* blink animation */
+@keyframes blink{
+  0%{opacity:1;}
+  50%{opacity:0.1;}
+  100%{opacity:1;}
 }
 
-.P{background:#ff3b3b;}
-.B{background:#2d6bff;}
-.T{background:#ffd000;color:black;}
-
-/* footer */
-.footer{
-    background:#0b1224;
-    border-top:1px solid #00c3ff;
-    padding:10px;
-    text-align:center;
-}
-
-.price{
-    color:gold;
-    animation:rainbow 3s infinite;
-}
-
-@keyframes rainbow{
-    0%{color:red;}
-    25%{color:yellow;}
-    50%{color:lime;}
-    75%{color:cyan;}
-    100%{color:magenta;}
+/* glow effect */
+.glow{
+  text-shadow:0 0 10px #fff,0 0 20px #aaa;
 }
 </style>
 </head>
 
 <body>
 
-<div class="main">
+<div class="container">
+  <div class="header glow">PERCENT SYSTEM</div>
 
-    <div>
-        <h1>🎰 SA SHOP SYSTEM</h1>
-        <div class="tag">🔒 ระบบวิเคราะห์แพทเทิร์น</div>
+  <input type="number" id="amount" placeholder="ยอดเงิน (เช่น 1000)">
+  <input type="number" id="percent" placeholder="เปอร์เซ็นต์ (เช่น 10)">
 
-        <div class="buttons">
-            <button class="red" onclick="add('P')">🔴 แดง</button>
-            <button class="blue" onclick="add('B')">🔵 น้ำเงิน</button>
-            <button class="tie" onclick="add('T')">🟡 เสมอ (กดเอง)</button>
-            <button class="gray" onclick="reset()">♻ รีเซ็ต</button>
-        </div>
+  <button onclick="calc()">คำนวณ</button>
 
-        <div id="bigBox" class="bigBox">-</div>
+  <div class="result" id="result">กรอกข้อมูลเพื่อคำนวณ</div>
 
-        <div class="box" id="trend">📊 แนวโน้ม: -</div>
-    </div>
-
-    <div class="road" id="road"></div>
-
-    <div class="footer">
-        <div>🏷 SA SHOP SYSTEM</div>
-        <div class="price">💰 DEMO</div>
-    </div>
-
+  <div class="creator">COC NCC</div>
 </div>
 
 <script>
-let h = [];
+function calc(){
+  let amount = parseFloat(document.getElementById("amount").value);
+  let percent = parseFloat(document.getElementById("percent").value);
 
-function add(v){
-    h.push(v);
-    draw();
-    analyze();
-}
+  if(isNaN(amount) || isNaN(percent)){
+    document.getElementById("result").innerHTML = "⚠️ กรุณากรอกข้อมูลให้ครบ";
+    return;
+  }
 
-function draw(){
-    let box = document.getElementById("road");
-    box.innerHTML = "";
+  let total = amount * (percent / 100);
 
-    h.forEach(x=>{
-        let d = document.createElement("div");
-        d.className = "cell " + x;
-        d.innerText = x;
-        box.appendChild(d);
-    });
-}
-
-function analyze(){
-    let last6 = h.slice(-6);
-
-    let p = last6.filter(x=>x==="P").length;
-    let b = last6.filter(x=>x==="B").length;
-
-    let box = document.getElementById("bigBox");
-    let trend = "สมดุล";
-
-    // 🔴 ไหลแดง
-    if(p >= 4 && p > b){
-        box.innerHTML = "🔴";
-        box.className = "bigBox redBox";
-        trend = "🔥 ไหลแดง";
-    }
-
-    // 🔵 ไหลน้ำเงิน
-    else if(b >= 4 && b > p){
-        box.innerHTML = "🔵";
-        box.className = "bigBox blueBox";
-        trend = "🔥 ไหลน้ำเงิน";
-    }
-
-    // 🔁 สลับ
-    else if(Math.abs(p - b) <= 1 && p >= 2 && b >= 2){
-        box.innerHTML = "🟡";
-        box.className = "bigBox tieBox";
-        trend = "🔁 สลับ";
-    }
-
-    // ⚖ ไม่ใช้เสมอในการตัดสิน
-    else{
-        box.innerHTML = (p >= b) ? "🔴" : "🔵";
-        box.className = (p >= b) ? "bigBox redBox" : "bigBox blueBox";
-        trend = "📊 ตามทรง";
-    }
-
-    document.getElementById("trend").innerHTML = "📊 แนวโน้ม: " + trend;
-}
-
-function reset(){
-    h = [];
-    draw();
-    document.getElementById("bigBox").innerHTML = "-";
-    document.getElementById("bigBox").className = "bigBox";
-    document.getElementById("trend").innerHTML = "📊 แนวโน้ม: -";
+  document.getElementById("result").innerHTML =
+    "💰 ได้ทั้งหมด: " + total.toFixed(2) + " บาท";
 }
 </script>
 
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pen</title>
+  </head>
+  <body>
+
+    <script src="./script.js"></script>
+  </body>
 </html>
