@@ -1,135 +1,344 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COC NCC Percent System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZAB VIP INJECTOR</title>
+    <style>
+        /* ฟอนต์ไซเบอร์เกมมิ่ง */
+        @import url('https://googleapis.com');
 
-<style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:linear-gradient(135deg,#000,#111,#000);
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', sans-serif;
+            background: radial-gradient(circle at center, #2b0000 0%, #080000 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-/* container */
-.container{
-  width:360px;
-  background:#0f0f0f;
-  border:1px solid #333;
-  border-radius:18px;
-  padding:25px;
-  box-shadow:0 0 25px rgba(255,255,255,0.05);
-  text-align:center;
-}
+        /* เอฟเฟกต์ไฟนีออนวิ่งพื้นหลัง */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(0deg, transparent 24%, rgba(255, 0, 0, 0.03) 25%, rgba(255, 0, 0, 0.03) 26%, transparent 27%, transparent 74%, rgba(255, 0, 0, 0.03) 75%, rgba(255, 0, 0, 0.03) 76%, transparent 77%);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
 
-/* header */
-.header{
-  font-size:20px;
-  letter-spacing:3px;
-  margin-bottom:15px;
-}
+        /* ภาพอนิเมะ Sukuna เงาสะท้อนสีแดง */
+        .anime-bg {
+            position: absolute;
+            bottom: -20px;
+            right: -30px;
+            width: 480px;
+            z-index: 1;
+            opacity: 0.75;
+            pointer-events: none;
+            filter: drop-shadow(0 0 30px #ff0000);
+            animation: floatAnime 4s ease-in-out infinite;
+        }
 
-/* input */
-input{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border-radius:10px;
-  border:1px solid #444;
-  background:#000;
-  color:white;
-  text-align:center;
-  font-size:15px;
-}
+        @keyframes floatAnime {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
 
-/* button */
-button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  background:white;
-  color:black;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.2s;
-}
+        /* กล่องเมนูพรีเมียม ZAB */
+        .menu-box {
+            background: rgba(10, 5, 5, 0.95);
+            border: 3px solid #ff0033;
+            border-radius: 20px;
+            padding: 35px;
+            width: 90%;
+            max-width: 460px;
+            box-shadow: 0 0 50px rgba(255, 0, 51, 0.5), inset 0 0 20px rgba(255, 0, 0, 0.2);
+            backdrop-filter: blur(15px);
+            z-index: 2;
+            margin: 20px;
+        }
 
-button:hover{
-  background:#ccc;
-}
+        /* หัวข้อชื่อแบรนด์ ZAB */
+        .brand-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #ff0033 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(255, 0, 51, 0.8));
+            letter-spacing: 5px;
+        }
 
-/* result */
-.result{
-  margin-top:15px;
-  font-size:18px;
-  color:#00ffcc;
-}
+        .menu-subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ff9999;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
 
-/* footer creator */
-.creator{
-  margin-top:20px;
-  font-size:13px;
-  letter-spacing:3px;
-  color:white;
-  animation:blink 1s infinite;
-}
+        /* สไตล์ไอเทมสวิตช์แต่ละระบบ */
+        .cheat-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(255, 0, 51, 0.1) 0%, rgba(0,0,0,0.5) 100%);
+            border: 1px solid rgba(255, 0, 51, 0.3);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
 
-/* blink animation */
-@keyframes blink{
-  0%{opacity:1;}
-  50%{opacity:0.1;}
-  100%{opacity:1;}
-}
+        .cheat-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #fff;
+        }
 
-/* glow effect */
-.glow{
-  text-shadow:0 0 10px #fff,0 0 20px #aaa;
-}
-</style>
+        /* ปุ่มเปิดปิดสไตล์นีออน */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 55px;
+            height: 28px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #222;
+            transition: .3s;
+            border-radius: 34px;
+            border: 1px solid #444;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #666;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: rgba(255, 0, 51, 0.2);
+            border-color: #ff0033;
+            box-shadow: 0 0 10px #ff0033;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(27px);
+            background-color: #ff0033;
+            box-shadow: 0 0 8px #ff0033;
+        }
+
+        /* เมนูสไตล์ให้เลือกเวอร์ชันเกม */
+        .game-selector-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .game-option {
+            flex: 1;
+        }
+
+        .game-option input[type="radio"] {
+            display: none;
+        }
+
+        .game-option label {
+            display: block;
+            background: #111;
+            border: 2px solid #333;
+            color: #aaa;
+            padding: 14px 5px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .game-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #330005 0%, #ff0033 100%);
+            border-color: #ffffff;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 51, 0.6);
+        }
+
+        /* ปุ่มรันระบบแฮกเกอร์ */
+        .run-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #ff0033 0%, #80001a 100%);
+            color: white;
+            border: 1px solid #ff6680;
+            padding: 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 5px 20px rgba(255, 0, 51, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .run-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px #ff0033;
+        }
+
+        /* กล่องคอนโซลแฮกเกอร์ขนาดใหญ่ขึ้น รองรับบรรทัดโค้ดวิ่งรัวๆ */
+        .terminal-console {
+            background: #000000;
+            border: 2px solid #222;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 25px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: #00ff66; /* สีเขียวสไตล์แฮกเกอร์โค้ด */
+            height: 140px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            box-shadow: inset 0 0 15px rgba(0, 255, 102, 0.1);
+        }
+
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #555;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            padding-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .anime-bg { display: none; }
+            .menu-box { width: 100%; padding: 25px; }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
-  <div class="header glow">PERCENT SYSTEM</div>
+    <img src="https://squarespace-cdn.com" alt="Anime" class="anime-bg">
 
-  <input type="number" id="amount" placeholder="ยอดเงิน (เช่น 1000)">
-  <input type="number" id="percent" placeholder="เปอร์เซ็นต์ (เช่น 10)">
+    <div class="menu-box">
+        <h1 class="brand-title">ZAB</h1>
+        <div class="menu-subtitle">Premium Injector Menu</div>
 
-  <button onclick="calc()">คำนวณ</button>
+        <!-- สวิตช์ 1 -->
+        <div class="cheat-card">
+            <div>
+                <div class="cheat-name">⚡ SYSTEM: จอไว</div>
+                <div style="font-size:0.8rem; color:#aaa;">Instant Touch Response</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="sw-speed">
+                <span class="slider"></span>
+            </label>
+        </div>
 
-  <div class="result" id="result">กรอกข้อมูลเพื่อคำนวณ</div>
+        <!-- สวิตช์ 2 -->
+        <div class="cheat-card">
+            <div>
+                <div class="cheat-name">🎯 SYSTEM: ดูดหัว 99%</div>
+                <div style="font-size:0.8rem; color:#aaa;">Auto Lock Aim Headshot</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="sw-aim">
+                <span class="slider"></span>
+            </label>
+        </div>
 
-  <div class="creator">COC NCC</div>
-</div>
+        <!-- สวิตช์ 3 -->
+        <div class="cheat-card">
+            <div>
+                <div class="cheat-name">🛡️ SYSTEM: กันดำกันแบน</div>
+                <div style="font-size:0.8rem; color:#aaa;">Anti-Ban Bypass Safe 100%</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="sw-ban">
+                <span class="slider"></span>
+            </label>
+        </div>
 
-<script>
-function calc(){
-  let amount = parseFloat(document.getElementById("amount").value);
-  let percent = parseFloat(document.getElementById("percent").value);
+        <!-- แผงเลือกเวอร์ชันเกมแบบติ๊กวิทยุ -->
+        <div class="game-selector-box">
+            <div class="game-option">
+                <input type="radio" id="game-normal" name="game_type" value="FreeFire_Normal" checked>
+                <label for="game-normal">1. ฟีฟายธรรมดา</label>
+            </div>
+            <div class="game-option">
+                <input type="radio" id="game-max" name="game_type" value="FreeFire_MAX">
+                <label for="game-max">2. ฟีฟายแม็กซ์</label>
+            </div>
+        </div>
 
-  if(isNaN(amount) || isNaN(percent)){
-    document.getElementById("result").innerHTML = "⚠️ กรุณากรอกข้อมูลให้ครบ";
-    return;
-  }
+        <!-- ปุ่มสำหรับกดรันโค้ดแฮกเกอร์ -->
+        <button class="run-btn" id="runHackerConsole()">RUN INJECTOR</button>
 
-  let total = amount * (percent / 100);
+        <!-- หน้าจอกล่องดำจำลองโค้ดวิ่งรัวๆ -->
+        <div class="terminal-console" id="cconst consoleDisplay = document.getElementById("console-display");
 
-  document.getElementById("result").innerHTML =
-    "💰 ได้ทั้งหมด: " + total.toFixed(2) + " บาท";
-}
-</script>
+function runHackerConsole() {
+    const lines = [
+        "[SYSTEM] Initializing interface...",
+        "[CORE] Loading assets...",
+        "[GPU] Optimizing graphics...",
+        "[NETWORK] Checking connection...",
+        "[MEMORY] Allocating resources...",
+        "[ENGINE] Loading modules...",
+        "[UI] Rendering components...",
+        "[SECURITY] Verification complete.",
+        "[STATUS] Ready."
+    ];
 
-</body>
-</html><!DOCTYPE html>
+    consoleDisplay.textContent = "";
+
+    let i = 0;
+
+    const timer = setInterval(() => {
+        consoleDisplay.textContent += lines[i] + "\n";
+        consoleDisplay.scrollTop = consoleDisplay.scrollHeight;
+        i++;
+
+        if (i >= lines.length) {
+            clearInterval(timer);
+        }
+    }, 400);
+}onsole-display">> SYSTEM STATUS: STANDBY...&#10;> SELECT OPTIONS AND PRESS 'RUN INJECTOR'</div>
+
+        <div class="footer-info">
+            <span>สิทธิ์ใช้งาน: ถาวร</span>
+            <span>ราคาล็อก: 300฿</span>
+        </div>
+    </div>
+
+    <script>
+        // แก้ไขสคริปต์ให้ดึงค่าแม่นยำ 100% และแสดงโค้ดแฮกเกอร์วิ่งสมจริง
+      <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
